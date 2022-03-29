@@ -7,7 +7,12 @@ class OrderItem {
   final List<CartItem> products;
   final DateTime dateTime;
 
-  OrderItem({this.id, this.amount, this.products, this.dateTime});
+  OrderItem({
+    this.id,
+    this.amount,
+    this.products,
+    this.dateTime,
+  });
 }
 
 class Orders with ChangeNotifier {
