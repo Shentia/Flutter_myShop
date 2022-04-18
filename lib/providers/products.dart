@@ -123,7 +123,6 @@ class Products with ChangeNotifier {
           'isFavorite': product.isFavorite,
         }),
       );
->>>>>>> b341759 (get Data from Firebase)
       final newProduct = Product(
         title: product.title,
         description: product.description,
