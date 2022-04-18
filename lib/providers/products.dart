@@ -40,18 +40,21 @@ class Products with ChangeNotifier {
     //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     // ),
   ];
-
   // var _showFavoritesOnly = false;
+
   List<Product> get items {
     // if (_showFavoritesOnly) {
-    //   //PrI => Product Item
-    //   return _items.where((PrI) => PrI.isFavorite).toList();
+    //   return _items.where((prodItem) => prodItem.isFavorite).toList();
     // }
     return [..._items];
   }
 
   List<Product> get favoriteItems {
-    return _items.where((prodIt) => prodIt.isFavorite).toList();
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
+  }
+
+  Product findById(String id) {
+    return _items.firstWhere((prod) => prod.id == id);
   }
 
   // void showFavoritesOnly() {
@@ -64,44 +67,24 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  Product findById(String id) {
-    return _items.firstWhere((prod) => prod.id == id);
-  }
-
-  Future<void> fetchAndSetProduct() async {
+  Future<void> fetchAndSetProducts() async {
     final url =
-        Uri.https('firebaseio.com', '/products.json');
-    return http
-        .post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'price': product.price,
-        'imageUrl': product.imageUrl,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((response) {
-        Uri.https('fluttea-default-rtdb.firebaseio.com', '/products.json');
+        Uri.https('flutter7a-default-rtdb.firebaseio.com', '/products.json');
+
     try {
-      final response =  http.get(url);
+      final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
-      extractedData.forEach(
-        (prodId, prodData) {
-          loadedProducts.add(
-            Product(
-              id: prodId,
-              title: prodData['title'],
-              description: prodData['description'],
-              price: prodData['price'],
-              isFavorite: prodData['isFavorite'],
-              imageUrl: prodData['imageUrl'],
-            ),
-          );
-        },
-      );
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          isFavorite: prodData['isFavorite'],
+          imageUrl: prodData['imageUrl'],
+        ));
+      });
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
@@ -118,8 +101,8 @@ class Products with ChangeNotifier {
         body: json.encode({
           'title': product.title,
           'description': product.description,
-          'price': product.price,
           'imageUrl': product.imageUrl,
+          'price': product.price,
           'isFavorite': product.isFavorite,
         }),
       );
@@ -130,27 +113,22 @@ class Products with ChangeNotifier {
         imageUrl: product.imageUrl,
         id: json.decode(response.body)['name'],
       );
-      // _items.add(newProduct);
-      _items.insert(0, newProduct);
+      _items.add(newProduct);
+      // _items.insert(0, newProduct); // at the start of the list
       notifyListeners();
     } catch (error) {
       print(error);
       throw error;
     }
-
-    // print(error);
-
-    // _items.add(value);
   }
 
   void updateProduct(String id, Product newProduct) {
-    final prodIndex = _items.indexWhere((prop) => prop.id == id);
-
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {
-      print('object');
+      print('...');
     }
   }
 
