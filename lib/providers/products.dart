@@ -69,7 +69,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url =
-        Uri.https('flutter7a-default-rtdb.firebaseio.com', '/products.json');
+        Uri.https('flutter747a-default-rtdb.firebaseio.com', '/products.json');
 
     try {
       final response = await http.get(url);
@@ -94,7 +94,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final url =
-        Uri.https('flutter7a-default-rtdb.firebaseio.com', '/products.json');
+        Uri.https('flutter747a-default-rtdb.firebaseio.com', '/products.json');
     try {
       final response = await http.post(
         url,
@@ -122,9 +122,24 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url = Uri.https(
+          'flutter747a-default-rtdb.firebaseio.com', '/products/$id.json');
+      await http.patch(
+        url,
+        body: json.encode(
+          {
+            'title': newProduct.title,
+            'price': newProduct.price,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'isFavorite': newProduct.isFavorite
+          },
+        ),
+      );
+
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {
