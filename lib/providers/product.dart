@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 //Mix in use with for implementing
 class Product with ChangeNotifier {
@@ -18,8 +21,29 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  void toggleFavoriteStatus() {
+  void _setFavValue(bool value) {
+    isFavorite = value;
+    notifyListeners();
+  }
+
+  Future<void> toggleFavoriteStatus() async {
+    final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+    final url = Uri.https(
+        'flutter747a-default-rtdb.firebaseio.com', '/products/$id.json');
+    try {
+      final response = await http.patch(
+        url,
+        body: json.encode(
+          {'isFavorite': isFavorite},
+        ),
+      );
+      if (response.statusCode >= 400) {
+        _setFavValue(oldStatus);
+      }
+    } catch (error) {
+      _setFavValue(oldStatus);
+    }
   }
 }
